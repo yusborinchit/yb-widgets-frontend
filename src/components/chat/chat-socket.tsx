@@ -3,15 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { env } from "~/env";
+import ChatMessage from "./chat-message";
 
 export interface Message {
   id: string;
-  user: {
-    color: string;
-    avatar: string;
-    badges: Record<string, number>;
-    name: string;
-  };
+  color: string;
+  emotes: Record<number, string[]>;
+  isFirstMessage: boolean;
+  isModerator: boolean;
+  isSubscriber: boolean;
+  username: string;
   message: string;
 }
 
@@ -30,6 +31,7 @@ export default function ChatSocket({ channelName }: Readonly<Props>) {
     socket.on("connect", () => socket.emit("chat_connect", channelName));
 
     socket.on("chat_message", (msg: Message) => {
+      console.log(msg);
       setMessages((prev) => [...prev, msg]);
     });
 
@@ -44,17 +46,10 @@ export default function ChatSocket({ channelName }: Readonly<Props>) {
   }, [messages]);
 
   return (
-    <div className="relative flex max-w-[400px] flex-col bg-black/60 px-4">
-      {messages.map((msg) => (
-        <div key={msg.id} className="flex gap-2 text-xl text-white">
-          <p
-            style={{ "--user-color": msg.user.color } as React.CSSProperties}
-            className="font-semibold text-[var(--user-color)]"
-          >
-            {msg.user.name}
-          </p>
-          <p>{msg.message}</p>
-        </div>
+    // TODO: Remove bg
+    <div className="flex min-h-[600px] max-w-[400px] flex-col gap-2 bg-black/60 px-4">
+      {messages.map((data) => (
+        <ChatMessage key={data.id} data={data} />
       ))}
       <div ref={lastMessageRef} />
     </div>

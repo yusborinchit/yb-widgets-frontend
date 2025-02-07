@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import ChatSocket from "~/components/socket/chat-socket";
+import ChatSocket from "~/components/chat/chat-socket";
 import { db } from "~/server/db";
 import { users } from "~/server/db/schema";
 
