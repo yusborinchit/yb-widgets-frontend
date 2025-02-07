@@ -1,3 +1,8 @@
+import { eq } from "drizzle-orm";
+import ChatSocket from "~/components/socket/chat-socket";
+import { db } from "~/server/db";
+import { users } from "~/server/db/schema";
+
 interface Props {
   params: Promise<{
     id: string;
@@ -7,5 +12,14 @@ interface Props {
 export default async function ChatOverlay({ params }: Readonly<Props>) {
   const { id } = await params;
 
-  return <div>Chat de {id}</div>;
+  const [user] = await db
+    .select({ channelName: users.name })
+    .from(users)
+    .where(eq(users.id, id));
+
+  return user?.channelName ? (
+    <ChatSocket channelName={user.channelName} />
+  ) : (
+    "Error"
+  );
 }
