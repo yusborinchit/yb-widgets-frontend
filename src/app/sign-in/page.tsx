@@ -18,7 +18,7 @@ export default function SignInPage() {
             Sign in to your account
           </p>
           <h2 className="text-5xl font-bold leading-[0.9] tracking-tighter">
-            YB/Widgets<span className="text-hm-500">.</span>
+            Welcome back!
           </h2>
         </div>
         <Separator className="my-6 bg-border" />

@@ -5,29 +5,34 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-interface StringReplacement {
-  stringToReplace: string;
-  replacement: string;
-}
+const emoteHTML = (id: string) =>
+  `<img src="https://static-cdn.jtvnw.net/emoticons/v1/${id}/3.0" width="24px" height="24px" class="inline" />`;
 
-export function getMessageHTML(
+export function parseMessageToHTML(
   message: string,
-  emotes: Record<number, string[]>,
+  emotes: Record<number, string[]> | null,
 ) {
   if (!emotes) return message;
 
-  const stringReplacements: StringReplacement[] = [];
+  const stringReplacements: {
+    stringToReplace: string;
+    replacement: string;
+  }[] = [];
+
   Object.entries(emotes).forEach(([id, positions]) => {
-    const position = positions[0];
+    const [position] = positions;
     const [start, end] = position!.split("-");
+
+    if (!position || !start || !end) return;
+
     const stringToReplace = message.substring(
-      parseInt(start!, 10),
-      parseInt(end!, 10) + 1,
+      parseInt(start, 10),
+      parseInt(end, 10) + 1,
     );
 
     stringReplacements.push({
       stringToReplace: stringToReplace,
-      replacement: `<img src="https://static-cdn.jtvnw.net/emoticons/v1/${id}/3.0" width="24px" height="24px" />`,
+      replacement: emoteHTML(id),
     });
   });
 

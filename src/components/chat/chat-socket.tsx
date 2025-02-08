@@ -8,7 +8,7 @@ import ChatMessage from "./chat-message";
 export interface Message {
   id: string;
   color: string;
-  emotes: Record<number, string[]>;
+  emotes: Record<number, string[]> | null;
   isFirstMessage: boolean;
   isModerator: boolean;
   isSubscriber: boolean;
@@ -46,10 +46,9 @@ export default function ChatSocket({ channelName }: Readonly<Props>) {
   }, [messages]);
 
   return (
-    // TODO: Remove bg
-    <div className="flex min-h-[600px] max-w-[400px] flex-col gap-2 bg-black/60 px-4">
-      {messages.map((data) => (
-        <ChatMessage key={data.id} data={data} />
+    <div className="flex h-[600px] w-[400px] flex-col gap-2 overflow-y-hidden bg-black px-4">
+      {messages.map((message) => (
+        <ChatMessage key={message.id} message={message} />
       ))}
       <div ref={lastMessageRef} />
     </div>

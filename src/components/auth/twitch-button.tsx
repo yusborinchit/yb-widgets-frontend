@@ -16,7 +16,11 @@ export default function TwitchButton() {
   }
 
   return (
-    <Button disabled={isLoading} onClick={handleSignIn}>
+    <Button
+      disabled={isLoading}
+      onClick={handleSignIn}
+      className="bg-purple-500 hover:bg-purple-700"
+    >
       {isLoading ? <Loader className="animate-spin" /> : <Twitch />}
       <span>{isLoading ? "Signing in..." : "Sign In with Twitch"}</span>
     </Button>

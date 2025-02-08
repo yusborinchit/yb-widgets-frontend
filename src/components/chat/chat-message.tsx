@@ -1,41 +1,33 @@
-import { getMessageHTML } from "~/lib/utils";
+"use client";
+
+import { parseMessageToHTML } from "~/lib/utils";
+import ChatBadge from "./chat-badge";
 import { type Message } from "./chat-socket";
 
 interface Props {
-  data: Message;
+  message: Message;
 }
 
-export default function ChatMessage({ data }: Readonly<Props>) {
+export default function ChatMessage({
+  message: { id, color, emotes, isModerator, isSubscriber, username, message },
+}: Readonly<Props>) {
   return (
     <div
-      key={data.id}
-      className="flex gap-2 text-xl text-white animate-in slide-in-from-left-[1000px]"
+      key={id}
+      className="flex items-start gap-2 text-lg text-white animate-in slide-in-from-left-[1000px]"
     >
-      {/* TODO: Change to actually badges */}
-      {data.isSubscriber && (
-        <img
-          src="/badges/sub.png"
-          alt={`Sub Badge for ${data.username}`}
-          className="size-6"
-        />
-      )}
-      {data.isModerator && (
-        <img
-          src="/badges/mod.png"
-          alt={`Mod Badge for ${data.username}`}
-          className="size-6"
-        />
-      )}
+      {isSubscriber && <ChatBadge src="/badges/sub.png" username={username} />}
+      {isModerator && <ChatBadge src="/badges/mod.png" username={username} />}
       <p
-        style={{ "--user-color": data.color } as React.CSSProperties}
+        style={{ "--user-color": color } as React.CSSProperties}
         className="font-bold text-[var(--user-color)]"
       >
-        {data.username}
+        {username}
       </p>
       <p
-        className="flex gap-1"
+        className="flex w-full flex-wrap gap-0.5 break-all"
         dangerouslySetInnerHTML={{
-          __html: getMessageHTML(data.message, data.emotes),
+          __html: parseMessageToHTML(message, emotes),
         }}
       />
     </div>
