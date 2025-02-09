@@ -12,26 +12,27 @@ import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `yb-widgets_${name}`);
 
-// export const posts = createTable(
-//   "post",
-//   {
-//     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-//     name: varchar("name", { length: 256 }),
-//     createdById: varchar("created_by", { length: 255 })
-//       .notNull()
-//       .references(() => users.id),
-//     createdAt: timestamp("created_at", { withTimezone: true })
-//       .default(sql`CURRENT_TIMESTAMP`)
-//       .notNull(),
-//     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-//       () => new Date(),
-//     ),
-//   },
-//   (example) => ({
-//     createdByIdIdx: index("created_by_idx").on(example.createdById),
-//     nameIndex: index("name_idx").on(example.name),
-//   }),
-// );
+export const chats = createTable(
+  "chat",
+  {
+    id: varchar("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    channelId: varchar("channel_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    width: integer("width").notNull().default(800),
+    height: integer("height").notNull().default(600),
+    fontSize: integer("font_size").notNull().default(18),
+    backgroundColor: varchar("background_color", { length: 255 })
+      .notNull()
+      .default("#00000000"),
+  },
+  (chat) => ({
+    channelIdIdx: index("channel_id_idx").on(chat.channelId),
+  }),
+);
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })

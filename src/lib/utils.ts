@@ -5,12 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const emoteHTML = (id: string) =>
-  `<img src="https://static-cdn.jtvnw.net/emoticons/v1/${id}/3.0" width="24px" height="24px" class="inline" />`;
+const emoteHTML = (id: string, size: number) =>
+  `<img src="https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0" width="${size * 1.5}px" height="${size * 1.5}px" alt="Emote ${id}">`;
 
 export function parseMessageToHTML(
   message: string,
   emotes: Record<number, string[]> | null,
+  emoteSize: number,
 ) {
   if (!emotes) return message;
 
@@ -32,7 +33,7 @@ export function parseMessageToHTML(
 
     stringReplacements.push({
       stringToReplace: stringToReplace,
-      replacement: emoteHTML(id),
+      replacement: emoteHTML(id, emoteSize),
     });
   });
 

@@ -1,7 +1,5 @@
-import { eq } from "drizzle-orm";
 import ChatSocket from "~/components/chat/chat-socket";
-import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
+import { QUERIES } from "~/server/db/sql";
 
 interface Props {
   params: Promise<{
@@ -12,13 +10,16 @@ interface Props {
 export default async function ChatOverlay({ params }: Readonly<Props>) {
   const { id } = await params;
 
-  const [user] = await db
-    .select({ channelName: users.name })
-    .from(users)
-    .where(eq(users.id, id));
+  const userNamePromise = QUERIES.getUserNameById(id);
+  const chatConfigPromise = QUERIES.getChatConfigByUserId(id);
 
-  return user?.channelName ? (
-    <ChatSocket channelName={user.channelName} />
+  const [[user], [chatConfig]] = await Promise.all([
+    userNamePromise,
+    chatConfigPromise,
+  ]);
+
+  return user?.channelName && chatConfig ? (
+    <ChatSocket channelName={user.channelName} chatConfig={chatConfig} />
   ) : (
     "Error"
   );

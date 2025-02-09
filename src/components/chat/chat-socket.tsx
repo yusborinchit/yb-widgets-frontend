@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { env } from "~/env";
+import { type chats } from "~/server/db/schema";
 import ChatMessage from "./chat-message";
 
 export interface Message {
@@ -18,9 +19,13 @@ export interface Message {
 
 interface Props {
   channelName: string;
+  chatConfig: typeof chats.$inferSelect;
 }
 
-export default function ChatSocket({ channelName }: Readonly<Props>) {
+export default function ChatSocket({
+  channelName,
+  chatConfig,
+}: Readonly<Props>) {
   const [messages, setMessages] = useState<Message[]>([]);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,7 +36,6 @@ export default function ChatSocket({ channelName }: Readonly<Props>) {
     socket.on("connect", () => socket.emit("chat_connect", channelName));
 
     socket.on("chat_message", (msg: Message) => {
-      console.log(msg);
       setMessages((prev) => [...prev, msg]);
     });
 
@@ -46,9 +50,22 @@ export default function ChatSocket({ channelName }: Readonly<Props>) {
   }, [messages]);
 
   return (
-    <div className="flex h-[600px] w-[400px] flex-col gap-2 overflow-y-hidden bg-black px-4">
+    <div
+      style={
+        {
+          "--chat-width": `${chatConfig.width}px`,
+          "--chat-height": `${chatConfig.height}px`,
+          "--chat-background": chatConfig.backgroundColor,
+        } as React.CSSProperties
+      }
+      className="flex h-[var(--chat-height,600px)] w-[var(--chat-width,800px)] flex-col gap-2 overflow-y-hidden bg-[var(--chat-background)] px-2"
+    >
       {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
+        <ChatMessage
+          key={message.id}
+          message={message}
+          chatConfig={chatConfig}
+        />
       ))}
       <div ref={lastMessageRef} />
     </div>

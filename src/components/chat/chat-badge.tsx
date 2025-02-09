@@ -5,6 +5,10 @@ interface Props {
 
 export default function ChatBadge({ src, username }: Readonly<Props>) {
   return (
-    <img src={src} alt={`Badge for ${username}`} className="mt-1 size-5" />
+    <img
+      src={src}
+      alt={`Badge for ${username}`}
+      className="size-[var(--chat-font-size)]"
+    />
   );
 }
