@@ -1,12 +1,13 @@
 import { eq } from "drizzle-orm";
 import { db } from ".";
-import { chats, users } from "./schema";
+import { accounts, chats, users } from "./schema";
 
 export const QUERIES = {
-  getUserNameById: (userId: string) => {
+  getUserDataById: (userId: string) => {
     return db
-      .select({ channelName: users.name })
+      .select({ name: users.name, refreshToken: accounts.refresh_token })
       .from(users)
+      .innerJoin(accounts, eq(accounts.userId, users.id))
       .where(eq(users.id, userId));
   },
   getChatConfigByUserId: (userId: string) => {

@@ -9,7 +9,6 @@ import ChatMessage from "./chat-message";
 export interface Message {
   id: string;
   color: string;
-  emotes: Record<number, string[]> | null;
   isFirstMessage: boolean;
   isModerator: boolean;
   isSubscriber: boolean;

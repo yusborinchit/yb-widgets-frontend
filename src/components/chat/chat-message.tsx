@@ -1,6 +1,5 @@
 "use client";
 
-import { parseMessageToHTML } from "~/lib/utils";
 import { type chats } from "~/server/db/schema";
 import ChatBadge from "./chat-badge";
 import { type Message } from "./chat-socket";
@@ -11,7 +10,7 @@ interface Props {
 }
 
 export default function ChatMessage({
-  message: { id, color, emotes, isModerator, isSubscriber, username, message },
+  message: { id, color, isModerator, isSubscriber, username, message },
   chatConfig,
 }: Readonly<Props>) {
   return (
@@ -35,9 +34,9 @@ export default function ChatMessage({
         </p>
       </div>
       <p
-        className="flex flex-1 flex-wrap items-center gap-2 break-all text-white [font-size:var(--chat-font-size)]"
+        className="flex flex-1 flex-wrap items-center gap-1 break-all text-white [font-size:var(--chat-font-size)] [&>img]:size-[calc(var(--chat-font-size)*1.5)]"
         dangerouslySetInnerHTML={{
-          __html: parseMessageToHTML(message, emotes, chatConfig.fontSize),
+          __html: message,
         }}
       />
     </div>

@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import MainContainer from "~/components/container/main-container";
+import Header from "~/components/header";
 import { auth } from "~/server/auth";
 
 interface Props {
@@ -14,5 +16,10 @@ export default async function DashboardLayout({ children }: Readonly<Props>) {
 
   if (!session?.user) redirect("/sign-in");
 
-  return children;
+  return (
+    <>
+      <Header />
+      <MainContainer as="main">{children}</MainContainer>
+    </>
+  );
 }

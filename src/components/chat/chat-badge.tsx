@@ -8,7 +8,7 @@ export default function ChatBadge({ src, username }: Readonly<Props>) {
     <img
       src={src}
       alt={`Badge for ${username}`}
-      className="size-[var(--chat-font-size)]"
+      className="size-[calc(var(--chat-font-size)*1.25]"
     />
   );
 }
