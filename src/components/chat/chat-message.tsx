@@ -13,18 +13,19 @@ export default function ChatMessage({
   message: { id, color, isModerator, isSubscriber, username, message },
   chatConfig,
 }: Readonly<Props>) {
+  const config = {
+    "--chat-font-size": `${chatConfig.fontSize}px`,
+    "--chat-font-color": chatConfig.fontColor,
+    "--chat-user-color": color,
+  } as React.CSSProperties;
+
   return (
     <div
       key={id}
-      style={
-        {
-          "--chat-font-size": `${chatConfig.fontSize}px`,
-          "--chat-user-color": color,
-        } as React.CSSProperties
-      }
+      style={config}
       className="flex items-start gap-2 animate-in slide-in-from-left-[1000px]"
     >
-      <div className="flex w-fit items-center gap-2">
+      <div className="flex w-fit items-center gap-2 [&>img]:size-[calc(var(--chat-font-size)*1)]">
         {isSubscriber && (
           <ChatBadge src="/badges/sub.png" username={username} />
         )}
@@ -34,7 +35,7 @@ export default function ChatMessage({
         </p>
       </div>
       <p
-        className="flex flex-1 flex-wrap items-center gap-1 break-all text-white [font-size:var(--chat-font-size)] [&>img]:size-[calc(var(--chat-font-size)*1.5)]"
+        className="flex flex-1 flex-wrap items-center gap-1 break-all [color:var(--chat-font-color)] [font-size:var(--chat-font-size)] [&>img]:size-[calc(var(--chat-font-size)*1.5)]"
         dangerouslySetInnerHTML={{
           __html: message,
         }}

@@ -25,6 +25,9 @@ export const chats = createTable(
     width: integer("width").notNull().default(800),
     height: integer("height").notNull().default(600),
     fontSize: integer("font_size").notNull().default(18),
+    fontColor: varchar("font_color", { length: 255 })
+      .notNull()
+      .default("#ffffff"),
     backgroundColor: varchar("background_color", { length: 255 })
       .notNull()
       .default("#00000000"),
