@@ -53,7 +53,7 @@ export default function EditChatForm({ chatConfig }: Readonly<Props>) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 grid gap-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -138,7 +138,11 @@ export default function EditChatForm({ chatConfig }: Readonly<Props>) {
             )}
           />
         </div>
-        <Button disabled={form.formState.isSubmitting} type="submit">
+        <Button
+          disabled={form.formState.isSubmitting}
+          type="submit"
+          className="mt-8"
+        >
           {form.formState.isSubmitting && <Loader className="animate-spin" />}
           <span>
             {form.formState.isSubmitting ? "Saving..." : "Save Changes"}

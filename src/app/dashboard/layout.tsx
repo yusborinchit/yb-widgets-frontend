@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import MainContainer from "~/components/container/main-container";
+import Footer from "~/components/footer";
 import Header from "~/components/header";
 import { auth } from "~/server/auth";
 
@@ -20,6 +21,7 @@ export default async function DashboardLayout({ children }: Readonly<Props>) {
     <>
       <Header />
       <MainContainer as="main">{children}</MainContainer>
+      <Footer />
     </>
   );
 }

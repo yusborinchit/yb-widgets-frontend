@@ -10,15 +10,15 @@ interface Props {
 export default async function ChatOverlay({ params }: Readonly<Props>) {
   const { id } = await params;
 
-  const userDataPromise = QUERIES.getUserDataById(id);
+  const userPromise = QUERIES.getUserDataById(id);
   const chatConfigPromise = QUERIES.getChatConfigByUserId(id);
 
   const [[user], [chatConfig]] = await Promise.all([
-    userDataPromise,
+    userPromise,
     chatConfigPromise,
   ]);
 
-  return user?.name && user?.refreshToken && chatConfig ? (
+  return user?.name && chatConfig ? (
     <ChatSocket channelName={user.name} chatConfig={chatConfig} />
   ) : (
     "Error"

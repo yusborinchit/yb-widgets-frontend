@@ -7,11 +7,18 @@ export function useChat() {
 
   useEffect(() => {
     if (!lastMessageRef.current) return;
-    lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+
+    lastMessageRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
   }, [messages]);
 
   const addMessage = useCallback((message: Message) => {
-    setMessages((prev) => [...prev, message]);
+    setMessages((prev) => {
+      const draft = [...prev, message];
+      return draft.length > 200 ? draft.slice(100) : draft;
+    });
   }, []);
 
   return { messages, addMessage, lastMessageRef };

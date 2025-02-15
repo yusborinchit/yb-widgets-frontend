@@ -17,7 +17,7 @@ export default function ChatPreview({ chatConfig }: Readonly<Props>) {
   useEffect(() => {
     const interval = setInterval(() => {
       addMessage(getRandomMockMessage());
-    }, 1000);
+    }, 500);
 
     return () => {
       clearInterval(interval);
@@ -25,7 +25,7 @@ export default function ChatPreview({ chatConfig }: Readonly<Props>) {
   }, [addMessage]);
 
   return (
-    <div className="grid gap-2">
+    <div className="mt-8 grid gap-2">
       <Label>Chat Preview:</Label>
       <div className="relative overflow-hidden rounded-md p-4">
         <div className="sticky left-0 top-0 flex h-[150px] flex-col gap-2 overflow-y-hidden">

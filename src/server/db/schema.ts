@@ -12,6 +12,77 @@ import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `yb-widgets_${name}`);
 
+export const medias = createTable(
+  "media",
+  {
+    id: varchar("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    key: varchar("key", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    type: varchar("type", { length: 255 }).notNull(),
+    url: varchar("url", { length: 500 }).notNull(),
+    uploadedBy: varchar("uploaded_by", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (media) => ({
+    keyIdx: index("media_key_idx").on(media.key),
+    uploadByIdx: index("media_upload_by_idx").on(media.uploadedBy),
+  }),
+);
+
+export const mediasRelations = relations(medias, ({ many, one }) => ({
+  user: one(users, {
+    fields: [medias.uploadedBy],
+    references: [users.id],
+  }),
+  followImage: many(follows, { relationName: "followImage" }),
+  followSound: many(follows, { relationName: "followSound" }),
+}));
+
+export const follows = createTable(
+  "follow",
+  {
+    id: varchar("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    channelId: varchar("channel_id", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    imageId: varchar("image_id", { length: 255 }).references(() => medias.id, {
+      onDelete: "set null",
+    }),
+    soundId: varchar("sound_id", { length: 255 }).references(() => medias.id, {
+      onDelete: "set null",
+    }),
+    width: integer("width").notNull().default(800),
+    height: integer("height").notNull().default(600),
+    text: varchar("text", { length: 255 })
+      .notNull()
+      .default("${user} thank you for the follow!"),
+  },
+  (follow) => ({
+    channelIdIdx: index("follow_channel_id_idx").on(follow.channelId),
+  }),
+);
+
+export const followsRelations = relations(follows, ({ one }) => ({
+  user: one(users, { fields: [follows.channelId], references: [users.id] }),
+  image: one(medias, {
+    fields: [follows.imageId],
+    references: [medias.id],
+    relationName: "followImage",
+  }),
+  sound: one(medias, {
+    fields: [follows.soundId],
+    references: [medias.id],
+    relationName: "followSound",
+  }),
+}));
+
 export const chats = createTable(
   "chat",
   {
@@ -21,7 +92,7 @@ export const chats = createTable(
       .$defaultFn(() => crypto.randomUUID()),
     channelId: varchar("channel_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     width: integer("width").notNull().default(800),
     height: integer("height").notNull().default(600),
     fontSize: integer("font_size").notNull().default(18),
@@ -33,9 +104,13 @@ export const chats = createTable(
       .default("#00000000"),
   },
   (chat) => ({
-    channelIdIdx: index("channel_id_idx").on(chat.channelId),
+    channelIdIdx: index("chat_channel_id_idx").on(chat.channelId),
   }),
 );
+
+export const chatsRelations = relations(chats, ({ one }) => ({
+  user: one(users, { fields: [chats.channelId], references: [users.id] }),
+}));
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
@@ -51,8 +126,13 @@ export const users = createTable("user", {
   image: varchar("image", { length: 255 }),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
+  chats: one(chats, { fields: [users.id], references: [chats.channelId] }),
+  follows: one(follows, {
+    fields: [users.id],
+    references: [follows.channelId],
+  }),
 }));
 
 export const accounts = createTable(
@@ -60,7 +140,7 @@ export const accounts = createTable(
   {
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     type: varchar("type", { length: 255 })
       .$type<AdapterAccount["type"]>()
       .notNull(),
@@ -96,7 +176,7 @@ export const sessions = createTable(
       .primaryKey(),
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     expires: timestamp("expires", {
       mode: "date",
       withTimezone: true,

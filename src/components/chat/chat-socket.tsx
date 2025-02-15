@@ -28,12 +28,6 @@ export default function ChatSocket({
 }: Readonly<Props>) {
   const { messages, addMessage, lastMessageRef } = useChat();
 
-  const config = {
-    "--chat-width": `${chatConfig.width}px`,
-    "--chat-height": `${chatConfig.height}px`,
-    "--chat-background": chatConfig.backgroundColor,
-  } as React.CSSProperties;
-
   useEffect(() => {
     if (!channelName) return;
 
@@ -46,6 +40,12 @@ export default function ChatSocket({
       socket.disconnect();
     };
   }, [channelName, addMessage]);
+
+  const config = {
+    "--chat-width": `${chatConfig.width}px`,
+    "--chat-height": `${chatConfig.height}px`,
+    "--chat-background": chatConfig.backgroundColor,
+  } as React.CSSProperties;
 
   return (
     <div
