@@ -40,6 +40,8 @@ export const mediasRelations = relations(medias, ({ many, one }) => ({
   }),
   followImage: many(follows, { relationName: "followImage" }),
   followSound: many(follows, { relationName: "followSound" }),
+  subImage: many(subs, { relationName: "subImage" }),
+  subSound: many(subs, { relationName: "subSound" }),
 }));
 
 export const follows = createTable(
@@ -80,6 +82,47 @@ export const followsRelations = relations(follows, ({ one }) => ({
     fields: [follows.soundId],
     references: [medias.id],
     relationName: "followSound",
+  }),
+}));
+
+export const subs = createTable(
+  "sub",
+  {
+    id: varchar("id", { length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    channelId: varchar("channel_id", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    imageId: varchar("image_id", { length: 255 }).references(() => medias.id, {
+      onDelete: "set null",
+    }),
+    soundId: varchar("sound_id", { length: 255 }).references(() => medias.id, {
+      onDelete: "set null",
+    }),
+    width: integer("width").notNull().default(800),
+    height: integer("height").notNull().default(600),
+    text: varchar("text", { length: 255 })
+      .notNull()
+      .default("${user} thank you for the subscription!"),
+  },
+  (sub) => ({
+    channelIdIdx: index("sub_channel_id_idx").on(sub.channelId),
+  }),
+);
+
+export const subsRelations = relations(subs, ({ one }) => ({
+  user: one(users, { fields: [subs.channelId], references: [users.id] }),
+  image: one(medias, {
+    fields: [subs.imageId],
+    references: [medias.id],
+    relationName: "subImage",
+  }),
+  sound: one(medias, {
+    fields: [subs.soundId],
+    references: [medias.id],
+    relationName: "subSound",
   }),
 }));
 

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from ".";
-import { accounts, chats, follows, medias, users } from "./schema";
+import { accounts, chats, follows, medias, subs, users } from "./schema";
 
 export const QUERIES = {
   getUserDataById: (userId: typeof users.$inferSelect.id) => {
@@ -15,6 +15,9 @@ export const QUERIES = {
   },
   getFollowConfigByUserId: (userId: typeof users.$inferSelect.id) => {
     return db.select().from(follows).where(eq(follows.channelId, userId));
+  },
+  getSubConfigByUserId: (userId: typeof users.$inferSelect.id) => {
+    return db.select().from(subs).where(eq(subs.channelId, userId));
   },
   getMediaByUserId: (userId: typeof users.$inferSelect.id) => {
     return db.select().from(medias).where(eq(medias.uploadedBy, userId));
@@ -41,6 +44,16 @@ export const MUTATIONS = {
       .set(followConfig)
       .where(eq(follows.channelId, userId))
       .returning({ id: follows.id });
+  },
+  updateSubConfigByUserId: (
+    userId: typeof users.$inferSelect.id,
+    subConfig: Omit<typeof subs.$inferSelect, "id" | "channelId">,
+  ) => {
+    return db
+      .update(subs)
+      .set(subConfig)
+      .where(eq(subs.channelId, userId))
+      .returning({ id: subs.id });
   },
   insertMedia: (media: typeof medias.$inferInsert) => {
     return db.insert(medias).values(media).returning({ id: medias.id });

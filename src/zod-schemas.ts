@@ -40,3 +40,21 @@ export const editFollowFormSchema = z.object({
     .min(1, { message: "Height must be greater than 0" }),
   text: z.string({ message: "Text must be a string" }),
 });
+
+export const editSubFormSchema = z.object({
+  imageId: z
+    .string()
+    .uuid({ message: "Image ID must be a valid UUID" })
+    .nullable(),
+  soundId: z
+    .string()
+    .uuid({ message: "Sound ID must be a valid UUID" })
+    .nullable(),
+  width: z
+    .number({ message: "Width must be a number" })
+    .min(1, { message: "Width must be greater than 0" }),
+  height: z
+    .number({ message: "Height must be a number" })
+    .min(1, { message: "Height must be greater than 0" }),
+  text: z.string({ message: "Text must be a string" }),
+});

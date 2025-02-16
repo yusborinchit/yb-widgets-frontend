@@ -7,9 +7,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { type z } from "zod";
 import { UploadDropzone } from "~/lib/uploadthing";
-import { updateFollowConfigAction } from "~/server/actions";
-import { type follows, type medias } from "~/server/db/schema";
-import { editFollowFormSchema } from "~/zod-schemas";
+import { getImagesAndSoundsFromMedia } from "~/lib/utils";
+import { updateSubConfigAction } from "~/server/actions";
+import { type medias, type subs } from "~/server/db/schema";
+import { editSubFormSchema } from "~/zod-schemas";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -30,44 +31,31 @@ import {
 } from "../ui/select";
 
 interface Props {
-  followConfig: typeof follows.$inferSelect;
+  config: typeof subs.$inferSelect;
   media: (typeof medias.$inferSelect)[];
 }
 
-export default function EditNotificationForm({
-  followConfig,
+export default function EditSubNotificationForm({
+  config,
   media,
 }: Readonly<Props>) {
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof editFollowFormSchema>>({
-    resolver: zodResolver(editFollowFormSchema),
+  const form = useForm<z.infer<typeof editSubFormSchema>>({
+    resolver: zodResolver(editSubFormSchema),
     defaultValues: {
-      imageId: followConfig.imageId,
-      soundId: followConfig.soundId,
-      width: followConfig.width,
-      height: followConfig.height,
-      text: followConfig.text,
+      imageId: config.imageId,
+      soundId: config.soundId,
+      width: config.width,
+      height: config.height,
+      text: config.text,
     },
   });
 
-  const { images, sounds } = media.reduce(
-    (acc, media) => {
-      const [type] = media.type.split("/");
+  const { images, sounds } = getImagesAndSoundsFromMedia(media);
 
-      if (type === "image" || type === "video") acc.images.push(media);
-      if (type === "audio") acc.sounds.push(media);
-
-      return acc;
-    },
-    { images: [], sounds: [] } as {
-      images: (typeof medias.$inferSelect)[];
-      sounds: (typeof medias.$inferSelect)[];
-    },
-  );
-
-  async function onSubmit(values: z.infer<typeof editFollowFormSchema>) {
-    const { success } = await updateFollowConfigAction(values);
+  async function onSubmit(values: z.infer<typeof editSubFormSchema>) {
+    const { success } = await updateSubConfigAction(values);
 
     if (!success) {
       toast("Something went wrong", {
@@ -75,7 +63,7 @@ export default function EditNotificationForm({
         position: "top-center",
       });
     } else {
-      toast("Successfully updated follow config", {
+      toast("Successfully updated sub config", {
         description: "Don't forget to restart the cache widget on OBS",
         position: "top-center",
       });
@@ -84,7 +72,7 @@ export default function EditNotificationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 grid gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 grid gap-4">
         <FormField
           control={form.control}
           name="imageId"
@@ -98,7 +86,7 @@ export default function EditNotificationForm({
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an image for the follow alert" />
+                    <SelectValue placeholder="Select an image for the subscription alert" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -111,8 +99,8 @@ export default function EditNotificationForm({
                 </SelectContent>
               </Select>
               <FormDescription className="text-xs">
-                In case of no image, the follow alert will be displayed as plain
-                text
+                In case of no image, the subscription alert will be displayed as
+                plain text
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -131,7 +119,7 @@ export default function EditNotificationForm({
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a sound for the follow alert" />
+                    <SelectValue placeholder="Select a sound for the subscription alert" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -144,7 +132,8 @@ export default function EditNotificationForm({
                 </SelectContent>
               </Select>
               <FormDescription className="text-xs">
-                In case of no sound, the follow alert will be displayed on mute
+                In case of no sound, the subscription alert will be displayed on
+                mute
               </FormDescription>
               <FormMessage />
             </FormItem>

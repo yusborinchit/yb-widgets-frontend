@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { type Message } from "~/components/chat/chat-socket";
+import { type medias } from "~/server/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -135,4 +136,23 @@ export function getRandomMockMessage() {
   const mockMessage =
     MOCK_MESSAGES[Math.floor(Math.random() * MOCK_MESSAGES.length)]!;
   return { ...mockMessage, id: crypto.randomUUID() };
+}
+
+interface ImagesAndSounds {
+  images: (typeof medias.$inferSelect)[];
+  sounds: (typeof medias.$inferSelect)[];
+}
+
+export function getImagesAndSoundsFromMedia(
+  media: (typeof medias.$inferSelect)[],
+) {
+  return media.reduce(
+    (acc, media) => {
+      const [type] = media.type.split("/");
+      if (type === "image" || type === "video") acc.images.push(media);
+      if (type === "audio") acc.sounds.push(media);
+      return acc;
+    },
+    { images: [], sounds: [] } as ImagesAndSounds,
+  );
 }
